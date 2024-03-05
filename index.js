@@ -111,6 +111,7 @@ app.post("/user", (req, res) => {
     if (newUser.name) {
         let user = users.users.find(user => user.name == newUser.name);
         if (!user) {
+            newUser.favoriteMovies = [];
             newUser.id = uuid.v4();
             users.users.push(newUser);
             res.status(201).json(newUser);
