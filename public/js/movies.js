@@ -13,7 +13,7 @@ var movieSchema = mongoose.Schema({
     "imagePath": String,
     "featured": Boolean,
     "genre": {
-        "type": String,
+        "type": {"type": String},
         "descritpion": String
     },
     "director": {
