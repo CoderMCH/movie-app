@@ -1,0 +1,17 @@
+body {
+    background-color: black;
+    color: white;
+}
+
+.tab1 {
+    display: inline-block;
+    margin-left: 20px;
+}
+.tab2 {
+    display: inline-block;
+    margin-left: 40px;
+}
+.tab3 {
+    display: inline-block;
+    margin-left: 60px;
+}

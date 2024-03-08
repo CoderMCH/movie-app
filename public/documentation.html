@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <title>Movie-app</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/darkTheme.css">
+    <link rel="stylesheet" href="css/darkTheme_tab.min.css">
 </head>
 
 <body>
@@ -15,145 +15,204 @@
     </header>
 
     <main>
-        <h1>This is document</h1>
-        <table class="table table-dark">
-            <thead>
-                <tr>
-                    <th>Description</th>
-                    <th>Method</th>
-                    <th>URL</th>
-                    <th>Body</th>
-                    <th>Results</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- movie -->
-                <tr>
-                    <th>Get a list of all movies</th>
-                    <th>Get</th>
-                    <th>/movies</th>
-                    <th> - </th>
-                    <th>
-                        {<br>
-                            "movies":[<br>
-                            "Shaolin Soccer","Ring"<br>
-                        ]}
-                    </th>
-                </tr>
-                <tr>
-                    <th>Get the specific movie</th>
-                    <th>Get</th>
-                    <th>/movie/:name</th>
-                    <th> - </th>
-                    <th>
-                        {<br>
-                        "name": "Ring",<br>
-                        "Description": "...",<br>
-                        "Director": "Hideo Nakata",<br>
-                        "Image": "..."<br>
-                        }
-                    </th>
-                </tr>
-                <tr>
-                    <th>Get the specific movie genre</th>
-                    <th>Get</th>
-                    <th>/movie/:name/genre</th>
-                    <th> - </th>
-                    <th>file</th>
-                </tr>
-                <!-- director -->
-                <tr>
-                    <th>Get a list of all directors</th>
-                    <th>Get</th>
-                    <th>/directors</th>
-                    <th> - </th>
-                    <th>
-                        {<br>
-                        "directors":[<br>
-                        "Hideo Nakata","Stephen Chow"<br>
-                        ]}
-                    </th>
-                </tr>
-                <tr>
-                    <th>Get the specific director</th>
-                    <th>Get</th>
-                    <th>/director/[name]</th>
-                    <th> - </th>
-                    <th>
-                        {<br>
-                        "name": "Stephen Chow",<br>
-                        "bio": "...",<br>
-                        "birth-year": 1962,<br>
-                        "death-year": null<br>
-                        }
-                    </th>
-                </tr>
-                <!-- user -->
-                <tr>
-                    <th>Register new user</th>
-                    <th>POST</th>
-                    <th>/user</th>
-                    <th>{<br>
-                        "name": "User Name"<br>
-                        }
-                    </th>
-                    <th>{<br>
-                        "name": "MCH",<br>
-                        "favoriteMovies": [],<br>
-                        "id": "34f"<br>
-                        }
-                    </th>
-                </tr>
-                <tr>
-                    <th>Update user name with user id</th>
-                    <th>PUT</th>
-                    <th>/user/:id</th>
-                    <th>{<br>
-                        "name": "CoderMCH"<br>
-                        }
-                    </th>
-                    <th>{<br>
-                        "name": "CoderMCH",<br>
-                        "favoriteMovies": [],<br>
-                        "id": "34f"<br>
-                        }
-                    </th>
-                </tr>
-                <tr>
-                    <th>Add movie to user's favorite movie list</th>
-                    <th>POST</th>
-                    <th>/user/:id/:movieTitle</th>
-                    <th> - </th>
-                    <th>{<br>
-                        "name": "CoderMCH",<br>
-                        "favoriteMovies": [<br>
-                            "Shaolin Soccer"<br>
-                        ],<br>
-                        "id": "34f"<br>
-                        }
-                    </th>
-                </tr>
-                <tr>
-                    <th>Remove movie from user's favorite movie list</th>
-                    <th>DELETE</th>
-                    <th>/user/:id/:movieTitle</th>
-                    <th> - </th>
-                    <th>{<br>
-                        "name": "CoderMCH",<br>
-                        "favoriteMovies": [],<br>
-                        "id": "34f"<br>
-                        }
-                    </th>
-                </tr>
-                <tr>
-                    <th>Deregister user</th>
-                    <th>DELETE</th>
-                    <th>/user</th>
-                    <th>{"id": "34f"}</th>
-                    <th>User has been removed</th>
-                </tr>
-            </tbody>
-        </table>
+        <h1>This is document of movie app api.</h1>
+        <div class="table-responsive">
+            <table class="table table-dark">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Method</th>
+                        <th>URL</th>
+                        <th>Body</th>
+                        <th>Result example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- movie -->
+                    <tr>
+                        <th>Get the list of all movies</th>
+                        <th>Get</th>
+                        <th>/movies</th>
+                        <th> - </th>
+                        <th>[<br>
+                            <span class="tab1"></span>{<br>
+                            <span class="tab2"></span>"genre": {<br>
+                            <span class="tab3"></span>"type": "horror",<br>
+                            <span class="tab3"></span>"description": "Horror is..."<br>
+                            <span class="tab2"></span>},<br>
+                            <span class="tab2"></span>"director": {<br>
+                            <span class="tab3"></span>"name": "Hideo Nakata",<br>
+                            <span class="tab3"></span>"bio": "Hideo Nakata is...",<br>
+                            <span class="tab3"></span>"birthday": "1961-07-19T04:00:00.000Z",<br>
+                            <span class="tab3"></span>"deathDate": null<br>
+                            <span class="tab2"></span>},<br>
+                            <span class="tab2"></span>"_id": "65ea7fc05c86da95258fee21",<br>
+                            <span class="tab2"></span>"title": "Ring",<br>
+                            <span class="tab2"></span>"description": "Ring ...",<br>
+                            <span class="tab2"></span>"imagePath": "https://en.wikipedia.org/wiki/Ring_(film)#/media/File:Ringu_(1998)_Japanese_theatrical_poster.jpg",<br>
+                            <span class="tab2"></span>"featured": false,<br>
+                            <span class="tab2"></span>"actors": []<br>
+                            <span class="tab1"></span>},<br>
+                            <span class="tab1"></span>{<br>
+                            <span class="tab2"></span>...<br>
+                            <span class="tab1"></span>}<br>
+                            ]
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Get the specific movie by title</th>
+                        <th>Get</th>
+                        <th>/movie/:title</th>
+                        <th> - </th>
+                        <th>[<br>
+                            <span class="tab1"></span>{<br>
+                            <span class="tab2"></span>"genre": {<br>
+                            <span class="tab3"></span>"type": "horror",<br>
+                            <span class="tab3"></span>"description": "Horror is..."<br>
+                            <span class="tab2"></span>},<br>
+                            <span class="tab2"></span>"director": {<br>
+                            <span class="tab3"></span>"name": "Hideo Nakata",<br>
+                            <span class="tab3"></span>"bio": "Hideo Nakata is...",<br>
+                            <span class="tab3"></span>"birthday": "1961-07-19T04:00:00.000Z",<br>
+                            <span class="tab3"></span>"deathDate": null<br>
+                            <span class="tab2"></span>},<br>
+                            <span class="tab2"></span>"_id": "65ea7fc05c86da95258fee21",<br>
+                            <span class="tab2"></span>"title": "Ring",<br>
+                            <span class="tab2"></span>"description": "Ring ...",<br>
+                            <span class="tab2"></span>"imagePath": "https://en.wikipedia.org/wiki/Ring_(film)#/media/File:Ringu_(1998)_Japanese_theatrical_poster.jpg",<br>
+                            <span class="tab2"></span>"featured": false,<br>
+                            <span class="tab2"></span>"actors": []<br>
+                            <span class="tab1"></span>}<br>
+                            ]
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Get the specific movie genre</th>
+                        <th>Get</th>
+                        <th>/movie/:title/genre</th>
+                        <th> - </th>
+                        <th>horror</th>
+                    </tr>
+                    <!-- director -->
+                    <tr>
+                        <th>Get the list of all directors</th>
+                        <th>Get</th>
+                        <th>/directors</th>
+                        <th> - </th>
+                        <th>[<br>
+                            <span class="tab1"></span>{<br>
+                            <span class="tab2"></span>"name": "Hideo Nakata",<br>
+                            <span class="tab2"></span>"bio": "Hideo Nakata is...",<br>
+                            <span class="tab2"></span>"birthday": "1961-07-19T04:00:00.000Z",<br>
+                            <span class="tab2"></span>"deathDate": null<br>
+                            <span class="tab1"></span>},<br>
+                            <span class="tab1"></span>{<br>
+                            <span class="tab2"></span>...<br>
+                            <span class="tab1"></span>}<br>
+                            ]
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Get the specific director by director's name</th>
+                        <th>Get</th>
+                        <th>/director/:name</th>
+                        <th> - </th>
+                        <th>[<br>
+                            <span class="tab1"></span>{<br>
+                            <span class="tab2"></span>"name": "Hideo Nakata",<br>
+                            <span class="tab2"></span>"bio": "Hideo Nakata is...",<br>
+                            <span class="tab2"></span>"birthday": "1961-07-19T04:00:00.000Z",<br>
+                            <span class="tab2"></span>"deathDate": null<br>
+                            <span class="tab1"></span>}<br>
+                            ]
+                        </th>
+                    </tr>
+                    <!-- user -->
+                    <tr>
+                        <th>Register new user. Username, password and email are required. Birthday is optional.</th>
+                        <th>POST</th>
+                        <th>/user</th>
+                        <th>{<br>
+                            <span class="tab1"></span>"username": "testing",<br>
+                            <span class="tab1"></span>"password": "pwd123",<br>
+                            <span class="tab1"></span>"email": "test@account.com"<br>
+                            }<br>
+                        </th>
+                        <th>{<br>
+                            <span class="tab1"></span>"username": "testing",<br>
+                            <span class="tab1"></span>"password": "pwd123",<br>
+                            <span class="tab1"></span>"email": "test@account.com",<br>
+                            <span class="tab1"></span>"favoriteMovies": [],<br>
+                            <span class="tab1"></span>"_id": "65ea8cc59e6ec6de3d75d493",<br>
+                            <span class="tab1"></span>"__v": 0<br>
+                            }
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Update user details with user id</th>
+                        <th>PUT</th>
+                        <th>/user/:id</th>
+                        <th>{<br>
+                            <span class="tab1"></span>"username": "testingAccount",<br>
+                            <span class="tab1"></span>"password": "123pwd",<br>
+                            <span class="tab1"></span>"email": "testing@account123.com"<br>
+                            }
+                        </th>
+                        <th>{<br>
+                            <span class="tab1"></span>"_id": "65ea8cc59e6ec6de3d75d493",<br>
+                            <span class="tab1"></span>"username": "testingAccount",<br>
+                            <span class="tab1"></span>"password": "123pwd",<br>
+                            <span class="tab1"></span>"email": "testing@account123.com",<br>
+                            <span class="tab1"></span>"favoriteMovies": [],<br>
+                            <span class="tab1"></span>"__v": 0<br>
+                            }
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Add movie to user's favorite movie list by input movie title</th>
+                        <th>POST</th>
+                        <th>/user/:id/:movieTitle</th>
+                        <th> - </th>
+                        <th>{<br>
+                            <span class="tab1"></span>"_id": "65ea8cc59e6ec6de3d75d493",<br>
+                            <span class="tab1"></span>"username": "testingAccount",<br>
+                            <span class="tab1"></span>"password": "123pwd",<br>
+                            <span class="tab1"></span>"email": "testing@account123.com",<br>
+                            <span class="tab1"></span>"favoriteMovies": [<br>
+                            <span class="tab2"></span>"65ea7fc05c86da95258fee21"<br>
+                            <span class="tab1"></span>],<br>
+                            <span class="tab1"></span>"__v": 0<br>
+                            }
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Remove movie from user's favorite movie list by input movie title</th>
+                        <th>DELETE</th>
+                        <th>/user/:id/:movieTitle</th>
+                        <th> - </th>
+                        <th>{<br>
+                            <span class="tab1"></span>"_id": "65ea8cc59e6ec6de3d75d493",<br>
+                            <span class="tab1"></span>"username": "testingAccount",<br>
+                            <span class="tab1"></span>"password": "123pwd",<br>
+                            <span class="tab1"></span>"email": "testing@account123.com",<br>
+                            <span class="tab1"></span>"favoriteMovies": [],<br>
+                            <span class="tab1"></span>"__v": 0<br>
+                            }
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Deregister user by user id</th>
+                        <th>DELETE</th>
+                        <th>/user</th>
+                        <th>{<br>
+                            <span class="tab1"></span>"id": "65ea8cc59e6ec6de3d75d493"<br>
+                            }
+                        </th>
+                        <th>testingAccount was deleted.</th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </main>
 
     <footer>
@@ -163,7 +222,6 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="js/script.js"></script>
 </body>
 
 </html>

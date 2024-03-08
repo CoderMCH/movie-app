@@ -1,49 +1,8 @@
 const express = require("express");
-const fs = require("fs");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
-const uuid = require("uuid");
 const app = express();
-
-var repositories = process.cwd() + "\\public\\repositories\\";
-var movies = {
-    "movies": []
-};
-fs.readdir(repositories + "movies", (err, files) => {
-    if (err) throw err;
-
-    files.forEach(file => {
-        fs.readFile(repositories + "\\movies\\" + file, (err, data) => {
-            movies.movies.push(JSON.parse(data));
-        })
-    })
-})
-
-var directors = {
-    "directors": []
-}
-fs.readdir(repositories + "directors", (err, files) => {
-    if (err) throw err;
-
-    files.forEach(file => {
-        fs.readFile(repositories + "\\directors\\" + file, (err, data) => {
-            directors.directors.push(JSON.parse(data));
-        })
-    })
-})
-
-var users = {
-    "users": []
-};
-fs.readdir(repositories + "users", (err, files) => {
-    if (err) throw err;
-
-    files.forEach(file => {
-        fs.readFile(repositories + "\\users\\" + file, (err, data) => {
-            users.users.push(JSON.parse(data));
-        })
-    })
-})
+const mongo = require("./public/js/movies.js");
 
 app.use(morgan("common"));
 
@@ -63,67 +22,97 @@ app.get("/", (req, res) => {
 
 // return movie list
 app.get("/movies", (req, res) => {
-    res.status(200).json(movies);
+    mongo.moviesModel.find().then(movies => {
+        res.status(200).json(movies);
+    }).catch(err => {
+        throw new Error(err);
+    })
 })
 
-// return details by movie name
-app.get("/movie/:name", (req, res) => {
-    let { name } = req.params;
-    let movie = movies.movies.find(movie => movie.name == name);
-    if (movie) {
-        res.status(200).json(movie);
-    } else {
-        res.status(400).send("No such movie");
-    }
+// return details by movie title
+app.get("/movie/:title", (req, res) => {
+    let { title } = req.params;
+    mongo.moviesModel.find({ "title": title }).then(movies => {
+        if (movies.length == 0) {
+            res.status(400).send("No such movie");
+        } else {
+            res.status(200).json(movies);
+        }
+    }).catch(err => {
+        throw new Error(err);
+    })
 })
 
-// return details by movie name
-app.get("/movie/:name/genre", (req, res) => {
-    let { name } = req.params;
-    let movie = movies.movies.find(movie => movie.name == name);
-    if (movie) {
-        res.status(200).send(movie.genre);
-    } else {
-        res.status(400).send("No such movie");
-    }
+// return details by movie title
+app.get("/movie/:title/genre", (req, res) => {
+    let { title } = req.params;
+    mongo.moviesModel.findOne({ "title": title }).then(movie => {
+        if (movie.length == 0) {
+            res.status(400).send("No such movie");
+        } else {
+            res.status(200).send(movie.genre.type);
+        }
+    }).catch(err => {
+        throw new Error(err);
+    })
 })
 
 // return director list
 app.get("/directors", (req, res) => {
-    res.status(200).json(directors);
+    mongo.moviesModel.find().then(movies => {
+        let directors = [];
+        movies.forEach(movie => {
+            if (!directors.find(director => director.bio == movie.director.bio)) {
+                directors.push(movie.director);
+            }
+        })
+        res.status(200).json(directors);
+    }).catch(err => {
+        throw new Error(err);
+    })
 })
 
 // return director inform
 app.get("/director/:name", (req, res) => {
     let { name } = req.params;
-    let director = directors.directors.find(director => director.name == name);
-    if (director) {
-        res.status(200).json(director);
-    } else {
-        res.status(400).send("No such director");
-    }
+    mongo.moviesModel.find( { "director.name": name }).then(movies => {
+        if (movies.length == 0) {
+            res.status(400).send("No such director");
+        } else {
+            res.status(200).json(movies[0].director);
+        }
+    }).catch(err => {
+        throw new Error(err);
+    })
 })
 
 // user related
 // register
 app.post("/user", (req, res) => {
     const newUser = req.body;
-    if (newUser.name) {
-        let user = users.users.find(user => user.name == newUser.name);
-        if (!user) {
-            newUser.favoriteMovies = [];
-            newUser.id = uuid.v4();
-            users.users.push(newUser);
-            res.status(201).json(newUser);
-            fs.writeFile(repositories + "\\users\\" + newUser.name + ".json", JSON.stringify(newUser),
-                (err) => {if (err) throw err;}
-            )
-        } else {
-            res.status(400).send("User exists");
-        }
-    } else {
+    if (!newUser.username || newUser.username == "") {
         res.status(400).send("User needs name");
+        return;
     }
+    mongo.usersModel.findOne({ "username": newUser.username }).then(user => {
+        if (user) {
+            res.status(400).send("User exists");
+            return;
+        }
+
+        mongo.usersModel.create({
+            "username": newUser.username,
+            "password": newUser.password,
+            "email": newUser.email,
+            "birthday": newUser.birthday
+        }).then(createdUser => {
+            res.status(201).json(createdUser);
+        }).catch(createErr => {
+            throw new Error(createErr);
+        })
+    }).catch(err => {
+        throw new Error(err);
+    })
 })
 
 // update user info
@@ -131,19 +120,20 @@ app.put("/user/:id", (req, res) => {
     const { id } = req.params;
     const updateUser = req.body;
 
-    let user = users.users.find(user => user.id == id);
-    if (user) {
-        let dirPath = repositories + "\\users\\";
-        fs.rename(dirPath + user.name + ".json", dirPath + updateUser.name + ".json", () => {
-            user.name = updateUser.name;
-            fs.writeFile(dirPath + user.name + ".json", JSON.stringify(user), (err) => {
-                if (err) throw err;
-                res.status(200).json(user);
-            })
-        })
-    } else {
-        res.status(400).send("User not exist");
-    }
+    console.log("updating username");
+    mongo.usersModel.findOneAndUpdate({ "_id": id }, {
+        $set: {
+            "username": updateUser.username,
+            "password": updateUser.password,
+            "email": updateUser.email,
+            "birthday": updateUser.birthday
+        }
+    }, { new: true }   // return updated user
+    ).then(user => {
+            res.status(200).json(user);
+    }).catch(err => {
+        res.status(400).send(err.message);
+    })
 })
 
 // delete user
@@ -153,49 +143,55 @@ app.delete("/user", (req, res) => {
         res.status(400).send("User id is missing")
         return;
     }
-
-    let user = users.users.find(user => user.id == deleteUser.id);
-    if (!user) return;
-    users = users.users.filter(user => user.id !== deleteUser.id);
-    console.log("users: [ " + users + " ]");
-    let filePath = repositories + "\\users\\" + user.name + ".json";
-    fs.rm(filePath, () => {});
-    res.status(200).send("User has been removed");
+    mongo.usersModel.findOneAndDelete({ "_id": deleteUser.id }).then(user => {
+        if (!user) {
+            res.status(400).send(user.username + ' was not found');
+        } else {
+            res.status(200).send(user.username + ' was deleted.');
+          }
+    }).catch(err => {
+        res.status(500).send(err.message)
+    })
 })
 
 // add favorite movies to user
-app.post("/user/:id/:movieTitle", (req, res) => {
-    const { id, movieTitle } = req.params;
-
-    let user = users.users.find(user => user.id == id);
-    if (user) {
-        user.favoriteMovies.push(movieTitle);
-        res.status(200).json(user);
-    } else {
-        res.status(400).send("User not exists");
-    }
+app.post("/user/:id/:title", (req, res) => {
+    const { id, title } = req.params;
+    mongo.moviesModel.find({ "title": title }).then(movie => {
+        if (movie.length != 1) {
+            res.status(400).send("No such movie");
+            return;
+        }
+        console.log("movie id: " + movie[0]._id)
+        mongo.usersModel.findOneAndUpdate({ "_id": id }, { $push: {
+            "favoriteMovies": movie[0]._id  // debug: id is missing in movie[0]
+        }}, { new: true }
+        ).then(user => {
+            res.status(200).json(user);
+        }).catch(findUserErr => {
+            res.status(400).send(findUserErr.message);
+        })
+    }).catch(findMovieErr => {
+        res.status(400).send(findMovieErr.message);
+    })
 })
 
 // remove a movie from user list
-app.delete("/user/:id/:movieTitle", (req, res) => {
-    const { id, movieTitle } = req.params;
-
-    let user = users.users.find(user => user.id == id);
-    if (user) {
-        user.favoriteMovies = user.favoriteMovies.filter(title => title !== movieTitle);
-        res.status(200).json(user);
-    } else {
-        res.status(400).send("User not exists");
-    }
+app.delete("/user/:id/:title", (req, res) => {
+    const { id, title } = req.params;
+    mongo.moviesModel.findOne({ "title": title }).then(movie => {
+        mongo.usersModel.findOneAndUpdate({ "_id": id}, { $pull: {
+            "favoriteMovies": movie._id
+        }}, { new: true}
+        ).then(user => {
+            res.status(200).json(user);
+        }).catch(findUserErr => {
+            res.status(400).send("No such user");
+        })
+    }).catch(findMovieErr => {
+        res.status(400).send(findMovieErr.message);
+    })
 })
-
-
-// used to trigger error handling
-app.get("/error", (req, res) => {
-    throw new Error("This is an error");
-})
-
-
 
 app.listen(8080, () => {
     console.log("server starts");
