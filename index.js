@@ -44,20 +44,14 @@ app.get("/movie/:title", (req, res) => {
 })
 
 // return details by movie title
-// debugging
-app.get("/movie/:type/genre", (req, res) => {
-    let { type } = req.params;
-    console.log(type)
-    mongo.moviesModel.find({ "genre.type": type }).then(movies => {
-        // if (movies.length == 0) {
-        //     res.status(400).send("No such movie");
-        // } else {
-        //     let mesg = "";
-        //     Array.from(movies).forEach(movie => {
-        //         mesg += movie.title + ":\t" + movie.genre.type + "\n";
-        //     });
-            res.status(200).json(movies);
-        // }
+app.get("/movie/:title/genre", (req, res) => {
+    let { title } = req.params;
+    mongo.moviesModel.findOne({ "title": title }).then(movie => {
+        if (movie.length == 0) {
+            res.status(400).send("No such movie");
+        } else {
+            res.status(200).send(movie.genre.type);
+        }
     }).catch(err => {
         throw new Error(err);
     })
@@ -110,7 +104,7 @@ app.post("/user", (req, res) => {
             "username": newUser.username,
             "password": newUser.password,
             "email": newUser.email,
-            "birthdate": newUser.birthdate
+            "birthday": newUser.birthday
         }).then(createdUser => {
             res.status(201).json(createdUser);
         }).catch(createErr => {
@@ -149,7 +143,7 @@ app.delete("/user", (req, res) => {
         res.status(400).send("User id is missing")
         return;
     }
-    mongo.usersModel.findOneAndDelete({ "_id": deleteUser.id}).then(user => {
+    mongo.usersModel.findOneAndDelete({ "_id": deleteUser.id }).then(user => {
         if (!user) {
             res.status(400).send(user.username + ' was not found');
         } else {
@@ -164,15 +158,18 @@ app.delete("/user", (req, res) => {
 app.post("/user/:id/:title", (req, res) => {
     const { id, title } = req.params;
     mongo.moviesModel.find({ "title": title }).then(movie => {
-        if (movie.length != 1) throw new Error("No such movie");
-
-        mongo.usersModel.findOneAndUpdate({ "_id": id}, { $push: {
+        if (movie.length != 1) {
+            res.status(400).send("No such movie");
+            return;
+        }
+        console.log("movie id: " + movie[0]._id)
+        mongo.usersModel.findOneAndUpdate({ "_id": id }, { $push: {
             "favoriteMovies": movie[0]._id  // debug: id is missing in movie[0]
         }}, { new: true }
         ).then(user => {
             res.status(200).json(user);
         }).catch(findUserErr => {
-            res.status(400).send("No such user");
+            res.status(400).send(findUserErr.message);
         })
     }).catch(findMovieErr => {
         res.status(400).send(findMovieErr.message);
@@ -182,11 +179,9 @@ app.post("/user/:id/:title", (req, res) => {
 // remove a movie from user list
 app.delete("/user/:id/:title", (req, res) => {
     const { id, title } = req.params;
-    mongo.moviesModel.find({ "title": title }).then(movie => {
-        if (movie.length != 1) throw new Error("No such movie");
-
+    mongo.moviesModel.findOne({ "title": title }).then(movie => {
         mongo.usersModel.findOneAndUpdate({ "_id": id}, { $pull: {
-            "favoriteMovies": movie[0]._id  // debug: id is missing in movie[0]
+            "favoriteMovies": movie._id
         }}, { new: true}
         ).then(user => {
             res.status(200).json(user);
