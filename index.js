@@ -7,6 +7,10 @@ const mongo = require("./public/js/movies.js");
 app.use(morgan("common"));
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+let auth = require('./public/js/auth.js')(app);
+let passport = require("passport");
 
 app.use(express.static("public"));
 
@@ -21,7 +25,7 @@ app.get("/", (req, res) => {
 })
 
 // return movie list
-app.get("/movies", (req, res) => {
+app.get("/movies", passport.authenticate('jwt', { session: false }), async (req, res) => {
     mongo.moviesModel.find().then(movies => {
         res.status(200).json(movies);
     }).catch(err => {
@@ -30,7 +34,7 @@ app.get("/movies", (req, res) => {
 })
 
 // return details by movie title
-app.get("/movie/:title", (req, res) => {
+app.get("/movie/:title", passport.authenticate('jwt', { session: false }), (req, res) => {
     let { title } = req.params;
     mongo.moviesModel.find({ "title": title }).then(movies => {
         if (movies.length == 0) {
@@ -44,7 +48,7 @@ app.get("/movie/:title", (req, res) => {
 })
 
 // return details by movie title
-app.get("/movie/:title/genre", (req, res) => {
+app.get("/movie/:title/genre", passport.authenticate('jwt', { session: false }), (req, res) => {
     let { title } = req.params;
     mongo.moviesModel.findOne({ "title": title }).then(movie => {
         if (movie.length == 0) {
@@ -58,7 +62,7 @@ app.get("/movie/:title/genre", (req, res) => {
 })
 
 // return director list
-app.get("/directors", (req, res) => {
+app.get("/directors", passport.authenticate('jwt', { session: false }), (req, res) => {
     mongo.moviesModel.find().then(movies => {
         let directors = [];
         movies.forEach(movie => {
@@ -73,7 +77,7 @@ app.get("/directors", (req, res) => {
 })
 
 // return director inform
-app.get("/director/:name", (req, res) => {
+app.get("/director/:name", passport.authenticate('jwt', { session: false }), (req, res) => {
     let { name } = req.params;
     mongo.moviesModel.find( { "director.name": name }).then(movies => {
         if (movies.length == 0) {
@@ -116,7 +120,7 @@ app.post("/user", (req, res) => {
 })
 
 // update user info
-app.put("/user/:id", (req, res) => {
+app.put("/user/:id", passport.authenticate('jwt', { session: false }), (req, res) => {
     const { id } = req.params;
     const updateUser = req.body;
 
@@ -137,7 +141,7 @@ app.put("/user/:id", (req, res) => {
 })
 
 // delete user
-app.delete("/user", (req, res) => {
+app.delete("/user", passport.authenticate('jwt', { session: false }), (req, res) => {
     const deleteUser = req.body;
     if (!deleteUser.id) {
         res.status(400).send("User id is missing")
@@ -155,7 +159,7 @@ app.delete("/user", (req, res) => {
 })
 
 // add favorite movies to user
-app.post("/user/:id/:title", (req, res) => {
+app.post("/user/:id/:title", passport.authenticate('jwt', { session: false }), (req, res) => {
     const { id, title } = req.params;
     mongo.moviesModel.find({ "title": title }).then(movie => {
         if (movie.length != 1) {
@@ -177,7 +181,7 @@ app.post("/user/:id/:title", (req, res) => {
 })
 
 // remove a movie from user list
-app.delete("/user/:id/:title", (req, res) => {
+app.delete("/user/:id/:title", passport.authenticate('jwt', { session: false }), (req, res) => {
     const { id, title } = req.params;
     mongo.moviesModel.findOne({ "title": title }).then(movie => {
         mongo.usersModel.findOneAndUpdate({ "_id": id}, { $pull: {
