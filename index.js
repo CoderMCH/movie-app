@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const app = express();
-const mongo = require("./public/js/movies.js");
+const mongo = require("./public/js/mongoDB.js");
 
 app.use(morgan("common"));
 
@@ -11,6 +11,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 let auth = require('./public/js/auth.js')(app);
 let passport = require("passport");
+
+const cors = require("cors");
+let allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
+app.use(cors({
+  origin: (origin, callback) => {
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){ // If a specific origin isn’t found on the list of allowed origins
+      let message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
+      return callback(new Error(message ), false);
+    }
+    return callback(null, true);
+  }
+}));
 
 app.use(express.static("public"));
 
@@ -197,6 +210,7 @@ app.delete("/user/:id/:title", passport.authenticate('jwt', { session: false }),
     })
 })
 
-app.listen(8080, () => {
-    console.log("server starts");
-})
+const port = process.env.PORT || 8080;
+app.listen(port, '0.0.0.0',() => {
+ console.log('Listening on Port ' + port);
+});

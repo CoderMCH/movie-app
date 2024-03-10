@@ -1,7 +1,7 @@
 const passport = require("passport");
 const localStrategy = require("passport-local").Strategy;
 const passportJWT = require("passport-jwt");
-const mongo = require("./movies.js");
+const mongo = require("./mongoDB.js");
 
 let usersModel = mongo.usersModel;
 let jwtStrategy = passportJWT.Strategy;
