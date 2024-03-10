@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+
 const mongoUsername = "admin";
 const mongoPassword = "admin";
 const mongoDatabase = "myFlixDB";
@@ -40,15 +42,15 @@ var userSchema = mongoose.Schema({
     "email": { type: String, required: true },
     "birthday": Date,
     "favoriteMovies": [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }]
-})
+});
 
 userSchema.statics.hashPassword = (password) => {
     return bcrypt.hashSync(password, 10);
-  };
-  
-  userSchema.methods.validatePassword = function(password) {
-    return bcrypt.compareSync(password, this.Password);
-  };
+};
+
+userSchema.methods.validatePassword = function(password) {
+    return bcrypt.compareSync(password, this.password);
+};
   
 var moviesModel = mongoose.model("movies", movieSchema);
 var usersModel = mongoose.model("users", userSchema);

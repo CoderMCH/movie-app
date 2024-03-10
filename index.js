@@ -119,7 +119,7 @@ app.post("/user", (req, res) => {
 
         mongo.usersModel.create({
             "username": newUser.username,
-            "password": newUser.password,
+            "password": mongo.usersModel.hashPassword(newUser.password),
             "email": newUser.email,
             "birthday": newUser.birthday
         }).then(createdUser => {
