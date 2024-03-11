@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
-mongoose.connect('mongodb://localhost:27017/moviesDB', { useNewUrlParser: true, useUnifiedTopology: true })
+const mongoUsername = "admin";
+const mongoPassword = "admin";
+const mongoDatabase = "myFlixDB";
+const mongoUrl = `mongodb+srv://${mongoUsername}:${mongoPassword}@myflixdb.mh7m8rk.mongodb.net/${mongoDatabase}?retryWrites=true&w=majority&appName=myFlixDB`;
+
+mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log("connect success");
     }).catch(err => {
@@ -36,8 +42,16 @@ var userSchema = mongoose.Schema({
     "email": { type: String, required: true },
     "birthday": Date,
     "favoriteMovies": [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }]
-})
+});
 
+userSchema.statics.hashPassword = (password) => {
+    return bcrypt.hashSync(password, 10);
+};
+
+userSchema.methods.validatePassword = function(password) {
+    return bcrypt.compareSync(password, this.password);
+};
+  
 var moviesModel = mongoose.model("movies", movieSchema);
 var usersModel = mongoose.model("users", userSchema);
 

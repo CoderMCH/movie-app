@@ -2,7 +2,8 @@ const express = require("express");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const app = express();
-const mongo = require("./public/js/movies.js");
+const mongo = require("./public/js/mongoDB.js");
+const { check, validationResult } = require("express-validator");
 
 app.use(morgan("common"));
 
@@ -11,6 +12,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 let auth = require('./public/js/auth.js')(app);
 let passport = require("passport");
+
+const cors = require("cors");
+let allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
+app.use(cors({
+  origin: (origin, callback) => {
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){ // If a specific origin isn’t found on the list of allowed origins
+      let message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
+      return callback(new Error(message ), false);
+    }
+    return callback(null, true);
+  }
+}));
 
 app.use(express.static("public"));
 
@@ -92,12 +106,18 @@ app.get("/director/:name", passport.authenticate('jwt', { session: false }), (re
 
 // user related
 // register
-app.post("/user", (req, res) => {
-    const newUser = req.body;
-    if (!newUser.username || newUser.username == "") {
-        res.status(400).send("User needs name");
-        return;
+app.post("/user", [
+    check("username", "Username must not empty").not().isEmpty(),
+    check("password", "Password must be more than 8 characters and contains number, lower case, upper case and special character")
+        .matches(/^(?=.*?[0-9])(?=.*?[A-Za-z])(?=.*[^0-9A-Za-z]).+.{8,}$/, "i"),
+    check("email", "Invalid email formmat").isEmail()
+], (req, res) => {
+    let validErrs = validationResult(req);
+    if (!validErrs.isEmpty()) {
+        return res.status(422).json({ errors: validErrs.array() });
     }
+
+    const newUser = req.body;
     mongo.usersModel.findOne({ "username": newUser.username }).then(user => {
         if (user) {
             res.status(400).send("User exists");
@@ -106,7 +126,7 @@ app.post("/user", (req, res) => {
 
         mongo.usersModel.create({
             "username": newUser.username,
-            "password": newUser.password,
+            "password": mongo.usersModel.hashPassword(newUser.password),
             "email": newUser.email,
             "birthday": newUser.birthday
         }).then(createdUser => {
@@ -197,6 +217,7 @@ app.delete("/user/:id/:title", passport.authenticate('jwt', { session: false }),
     })
 })
 
-app.listen(8080, () => {
-    console.log("server starts");
-})
+const port = process.env.PORT || 8080;
+app.listen(port, '0.0.0.0',() => {
+ console.log('Listening on Port ' + port);
+});
