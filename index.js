@@ -35,7 +35,7 @@ app.use((err, req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-    res.status(200).send("testual result");
+    res.status(200).send("this is my flix backend\nrequest documentation.html for more details");
 })
 
 // return movie list
