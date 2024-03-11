@@ -3,7 +3,7 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const app = express();
 const mongo = require("./public/js/mongoDB.js");
-const { check, validationResult, body } = require("express-validator");
+const { check, validationResult } = require("express-validator");
 
 app.use(morgan("common"));
 
@@ -108,7 +108,8 @@ app.get("/director/:name", passport.authenticate('jwt', { session: false }), (re
 // register
 app.post("/user", [
     check("username", "Username must not empty").not().isEmpty(),
-    check("password", "Password must be more than 8 characters").isLength({min: 8}),
+    check("password", "Password must be more than 8 characters and contains number, lower case, upper case and special character")
+        .matches(/^(?=.*?[0-9])(?=.*?[A-Za-z])(?=.*[^0-9A-Za-z]).+.{8,}$/, "i"),
     check("email", "Invalid email formmat").isEmail()
 ], (req, res) => {
     let validErrs = validationResult(req);
