@@ -3,6 +3,7 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const app = express();
 const mongo = require("./public/js/mongoDB.js");
+const { check, validationResult, body } = require("express-validator");
 
 app.use(morgan("common"));
 
@@ -105,12 +106,17 @@ app.get("/director/:name", passport.authenticate('jwt', { session: false }), (re
 
 // user related
 // register
-app.post("/user", (req, res) => {
-    const newUser = req.body;
-    if (!newUser.username || newUser.username == "") {
-        res.status(400).send("User needs name");
-        return;
+app.post("/user", [
+    check("username", "Username must not empty").not().isEmpty(),
+    check("password", "Password must be more than 8 characters").isLength({min: 8}),
+    check("email", "Invalid email formmat").isEmail()
+], (req, res) => {
+    let validErrs = validationResult(req);
+    if (!validErrs.isEmpty()) {
+        return res.status(422).json({ errors: validErrs.array() });
     }
+
+    const newUser = req.body;
     mongo.usersModel.findOne({ "username": newUser.username }).then(user => {
         if (user) {
             res.status(400).send("User exists");
