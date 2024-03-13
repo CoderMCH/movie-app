@@ -14,17 +14,18 @@ let auth = require('./public/js/auth.js')(app);
 let passport = require("passport");
 
 const cors = require("cors");
-let allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
-app.use(cors({
-  origin: (origin, callback) => {
-    if(!origin) return callback(null, true);
-    if(allowedOrigins.indexOf(origin) === -1){ // If a specific origin isn’t found on the list of allowed origins
-      let message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
-      return callback(new Error(message ), false);
-    }
-    return callback(null, true);
-  }
-}));
+let allowedOrigins = ["*"];
+app.use(cors());
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     if(!origin) return callback(null, true);
+//     if(allowedOrigins.indexOf(origin) === -1){ // If a specific origin isn’t found on the list of allowed origins
+//       let message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
+//       return callback(new Error(message ), false);
+//     }
+//     return callback(null, true);
+//   }
+// }));
 
 app.use(express.static("public"));
 
@@ -105,6 +106,15 @@ app.get("/director/:name", passport.authenticate('jwt', { session: false }), (re
 })
 
 // user related
+// get user list
+app.get("/users", passport.authenticate("jwt", { session: false }), (req, res) => {
+    mongo.usersModel.find().then(users => {
+        res.status(200).json(users);
+    }).catch(err => {
+        throw new Error(err);
+    })
+})
+
 // register
 app.post("/user", [
     check("username", "Username must not empty").not().isEmpty(),
