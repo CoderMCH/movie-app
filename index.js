@@ -205,7 +205,7 @@ app.post("/user/:id/:title", passport.authenticate('jwt', { session: false }), (
             return;
         }
         console.log("movie id: " + movie[0]._id)
-        mongo.usersModel.findOneAndUpdate({ "_id": id }, { $push: {
+        mongo.usersModel.findOneAndUpdate({ "_id": id }, { $addToSet: {
             "favoriteMovies": movie[0]._id  // debug: id is missing in movie[0]
         }}, { new: true }
         ).then(user => {
