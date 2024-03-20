@@ -120,8 +120,8 @@ app.get("/users", passport.authenticate("jwt", { session: false }), (req, res) =
 // register
 app.post("/user", [
     check("username", "Username must not empty").not().isEmpty(),
-    check("password", "Password must be more than 8 characters and contains number, lower case, upper case and special character")
-        .matches(/^(?=.*?[0-9])(?=.*?[A-Za-z])(?=.*[^0-9A-Za-z]).+.{8,}$/, "i"),
+    // check("password", "Password must be more than 8 characters and contains number, lower case, upper case and special character")
+    //     .matches(/^(?=.*?[0-9])(?=.*?[A-Za-z])(?=.*[^0-9A-Za-z]).+.{8,}$/, "i"),
     check("email", "Invalid email formmat").isEmail()
 ], (req, res) => {
     let validErrs = validationResult(req);
