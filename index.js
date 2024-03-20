@@ -3,6 +3,7 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
+app.use(cors());
 const mongo = require("./public/js/mongoDB.js");
 const { check, validationResult } = require("express-validator");
 
@@ -16,7 +17,7 @@ let passport = require("passport");
 
 
 let allowedOrigins = ["http://localhost:1234", "http://localhost:3000"];
-app.use(cors());
+
 // app.use(cors({
 //   origin: (origin, callback) => {
 //     if(!origin) return callback(null, true);
