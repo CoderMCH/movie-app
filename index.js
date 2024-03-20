@@ -31,11 +31,11 @@ let allowedOrigins = ["http://localhost:1234", "http://localhost:3000"];
 
 app.use(express.static("public"));
 
-app.use((err, req, res, next) => {
-    console.error(err.message)
-    console.error(err.stack);
-    res.status(500).send("Something broke!");
-});
+// app.use((err, req, res, next) => {
+//     console.error(err.message)
+//     console.error(err.stack);
+//     res.status(500).send("Something broke!");
+// });
 
 app.get("/", (req, res) => {
     res.status(200).send("this is my flix backend\nrequest documentation.html for more details");
