@@ -151,16 +151,24 @@ app.post("/user", [
     })
 })
 
+app.get("/user/:id", passport.authenticate('jwt', { session: false }), (req, res) => {
+    let { id } = req.params;
+    mongo.usersModel.findOne({ "_id": id}).then(user => {
+        res.status(200).json(user);
+    }).catch(err => {
+        throw new Error(err);
+    })
+})
+
 // update user info
 app.put("/user/:id", passport.authenticate('jwt', { session: false }), (req, res) => {
     const { id } = req.params;
     const updateUser = req.body;
 
-    console.log("updating username");
     mongo.usersModel.findOneAndUpdate({ "_id": id }, {
         $set: {
             "username": updateUser.username,
-            "password": updateUser.password,
+            "password": mongo.usersModel.hashPassword(updateUser.password),
             "email": updateUser.email,
             "birthday": updateUser.birthday
         }
@@ -199,7 +207,7 @@ app.post("/user/:id/:title", passport.authenticate('jwt', { session: false }), (
             return;
         }
         console.log("movie id: " + movie[0]._id)
-        mongo.usersModel.findOneAndUpdate({ "_id": id }, { $push: {
+        mongo.usersModel.findOneAndUpdate({ "_id": id }, { $addToSet: {
             "favoriteMovies": movie[0]._id  // debug: id is missing in movie[0]
         }}, { new: true }
         ).then(user => {
