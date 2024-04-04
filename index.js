@@ -6,15 +6,6 @@ const app = express();
 const mongo = require("./public/js/mongoDB.js");
 const { check, validationResult } = require("express-validator");
 
-app.use(morgan("common"));
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-let auth = require('./public/js/auth.js')(app);
-let passport = require("passport");
-
-
 let allowedOrigins = ['http://localhost:8080', 'http://localhost:1234', 'https://main--mch-flix.netlify.app'];
 app.use(cors({
   origin: (origin, callback) => {
@@ -26,6 +17,14 @@ app.use(cors({
     return callback(null, true);
   }
 }));
+
+app.use(morgan("common"));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+let auth = require('./public/js/auth.js')(app);
+let passport = require("passport");
 
 app.use(express.static("public"));
 
