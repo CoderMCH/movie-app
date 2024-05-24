@@ -47,6 +47,20 @@ app.get("/movies", passport.authenticate('jwt', { session: false }), async (req,
     })
 })
 
+// return movie by movie id
+app.get("/movieid/:id", /*passport.authenticate('jwt', { session: false }),*/ (req, res) => {
+    let { id } = req.params;
+    mongo.moviesModel.find({ "_id": id }).then(movies => {
+        if (movies.length == 0) {
+            res.status(400).send("No such movie");
+        } else {
+            res.status(200).json(movies);
+        }
+    }).catch(err => {
+        throw new Error(err);
+    })
+})
+
 // return details by movie title
 app.get("/movie/:title", passport.authenticate('jwt', { session: false }), (req, res) => {
     let { title } = req.params;
