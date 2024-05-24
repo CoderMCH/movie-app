@@ -48,7 +48,7 @@ app.get("/movies", passport.authenticate('jwt', { session: false }), async (req,
 })
 
 // return movie by movie id
-app.get("/movieid/:id", /*passport.authenticate('jwt', { session: false }),*/ (req, res) => {
+app.get("/movieid/:id", passport.authenticate('jwt', { session: false }), (req, res) => {
     let { id } = req.params;
     mongo.moviesModel.find({ "_id": id }).then(movies => {
         if (movies.length == 0) {
