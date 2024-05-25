@@ -6,7 +6,7 @@ const app = express();
 const mongo = require("./public/js/mongoDB.js");
 const { check, validationResult } = require("express-validator");
 
-let allowedOrigins = ['http://localhost:8080', 'http://localhost:1234', 'https://main--mch-flix.netlify.app'];
+let allowedOrigins = ['http://localhost:8080', 'http://localhost:1234', 'https://main--mch-flix.netlify.app', "https://codermch.github.io"];
 app.use(cors({
   origin: (origin, callback) => {
     if(!origin) return callback(null, true);
