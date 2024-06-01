@@ -34,11 +34,16 @@ app.use((err, req, res, next) => {
     res.status(500).send("Something broke!");
 });
 
+/**
+ * home page of movie-app-server
+ */
 app.get("/", (req, res) => {
     res.status(200).send("this is my flix backend\nrequest documentation.html for more details");
 })
 
-// return movie list
+/**
+ * get all the movies from database
+ */
 app.get("/movies", passport.authenticate('jwt', { session: false }), async (req, res) => {
     mongo.moviesModel.find().then(movies => {
         res.status(200).json(movies);
@@ -47,7 +52,9 @@ app.get("/movies", passport.authenticate('jwt', { session: false }), async (req,
     })
 })
 
-// return movie by movie id
+/**
+ * get movie by movie id
+ */
 app.get("/movieid/:id", passport.authenticate('jwt', { session: false }), (req, res) => {
     let { id } = req.params;
     mongo.moviesModel.find({ "_id": id }).then(movies => {
@@ -61,7 +68,9 @@ app.get("/movieid/:id", passport.authenticate('jwt', { session: false }), (req, 
     })
 })
 
-// return details by movie title
+/**
+ * get movie details by title
+*/
 app.get("/movie/:title", passport.authenticate('jwt', { session: false }), (req, res) => {
     let { title } = req.params;
     mongo.moviesModel.find({ "title": title }).then(movies => {
@@ -75,7 +84,9 @@ app.get("/movie/:title", passport.authenticate('jwt', { session: false }), (req,
     })
 })
 
-// return details by movie title
+/**
+ * get movie's genre by movie title
+*/
 app.get("/movie/:title/genre", passport.authenticate('jwt', { session: false }), (req, res) => {
     let { title } = req.params;
     mongo.moviesModel.findOne({ "title": title }).then(movie => {
@@ -89,7 +100,9 @@ app.get("/movie/:title/genre", passport.authenticate('jwt', { session: false }),
     })
 })
 
-// return director list
+/**
+ * get all directors
+ */
 app.get("/directors", passport.authenticate('jwt', { session: false }), (req, res) => {
     mongo.moviesModel.find().then(movies => {
         let directors = [];
@@ -104,7 +117,9 @@ app.get("/directors", passport.authenticate('jwt', { session: false }), (req, re
     })
 })
 
-// return director inform
+/**
+ * get director's detail by director's name
+ */
 app.get("/director/:name", passport.authenticate('jwt', { session: false }), (req, res) => {
     let { name } = req.params;
     mongo.moviesModel.find( { "director.name": name }).then(movies => {
@@ -118,8 +133,9 @@ app.get("/director/:name", passport.authenticate('jwt', { session: false }), (re
     })
 })
 
-// user related
-// get user list
+/**
+ * get all users
+ */
 app.get("/users", passport.authenticate("jwt", { session: false }), (req, res) => {
     mongo.usersModel.find().then(users => {
         res.status(200).json(users);
@@ -128,7 +144,9 @@ app.get("/users", passport.authenticate("jwt", { session: false }), (req, res) =
     })
 })
 
-// register
+/**
+ * register new user
+ */
 app.post("/user", [
     check("username", "Username must not empty").not().isEmpty(),
     check("password", "Password must be more than 8 characters and contains number, lower case, upper case and special character")
@@ -162,6 +180,9 @@ app.post("/user", [
     })
 })
 
+/**
+ * get user by id
+ */
 app.get("/user/:id", passport.authenticate('jwt', { session: false }), (req, res) => {
     let { id } = req.params;
     mongo.usersModel.findOne({ "_id": id}).then(user => {
@@ -171,7 +192,9 @@ app.get("/user/:id", passport.authenticate('jwt', { session: false }), (req, res
     })
 })
 
-// update user info
+/**
+ * update user details
+ */
 app.put("/user/:id", passport.authenticate('jwt', { session: false }), (req, res) => {
     const { id } = req.params;
     const updateUser = req.body;
@@ -191,7 +214,9 @@ app.put("/user/:id", passport.authenticate('jwt', { session: false }), (req, res
     })
 })
 
-// delete user
+/**
+ * delete user
+ */
 app.delete("/user", passport.authenticate('jwt', { session: false }), (req, res) => {
     const deleteUser = req.body;
     if (!deleteUser.id) {
@@ -209,7 +234,9 @@ app.delete("/user", passport.authenticate('jwt', { session: false }), (req, res)
     })
 })
 
-// add favorite movies to user
+/**
+ * add favorite movies to user
+*/
 app.post("/user/:id/:title", passport.authenticate('jwt', { session: false }), (req, res) => {
     const { id, title } = req.params;
     mongo.moviesModel.find({ "title": title }).then(movie => {
@@ -231,7 +258,9 @@ app.post("/user/:id/:title", passport.authenticate('jwt', { session: false }), (
     })
 })
 
-// remove a movie from user list
+/**
+ * remove movie from user favorite list
+ */
 app.delete("/user/:id/:title", passport.authenticate('jwt', { session: false }), (req, res) => {
     const { id, title } = req.params;
     mongo.moviesModel.findOne({ "title": title }).then(movie => {
