@@ -4,7 +4,12 @@ const bcrypt = require('bcrypt');
 const mongoUsername = "admin";
 const mongoPassword = "admin";
 const mongoDatabase = "myFlixDB";
+
+// mongoDB atlas
 const mongoUrl = `mongodb+srv://${mongoUsername}:${mongoPassword}@myflixdb.mh7m8rk.mongodb.net/${mongoDatabase}?retryWrites=true&w=majority&appName=myFlixDB`;
+
+// AWS server
+// const mongoUrl = `mongodb://localhost:27017/${mongoDatabase}`;
 
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
